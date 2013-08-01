@@ -11,3 +11,7 @@ or you can convert encode like this:
 TODO list:
 
 1. ARRAY's support
+  like:
+    mysql> select json(JSON_TEXT,"foo.bar[0]");
+  or:
+    mysql> select json(JSON_TEXT,"foo.bar[0].foo2.bar2");
