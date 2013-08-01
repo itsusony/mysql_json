@@ -82,6 +82,7 @@ char *json(UDF_INIT *initid, UDF_ARGS *args,
                 }
                 *length = result == NULL ? 0 : strlen(result); 
             }
+            json_value_free(value);
         }else{
             *is_null = 1;
         }
