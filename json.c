@@ -17,10 +17,12 @@ my_bool json_init(UDF_INIT *initid, UDF_ARGS *args, char *message){
         strcpy(message, "json() requires args not null");
         return 1;
     }
+    initid->ptr = calloc(10240,sizeof(char));
     return 0;
 }
 
 void json_deinit(UDF_INIT *initid){
+    free(initid->ptr);
 }
 
 char *json(UDF_INIT *initid, UDF_ARGS *args,
@@ -30,7 +32,6 @@ char *json(UDF_INIT *initid, UDF_ARGS *args,
     JSON_Value *jv = json_parse_string(args->args[0]);
     JSON_Value_Type json_type = json_value_get_type(jv);
     if(json_type==JSONError){
-        result=NULL;
         *length=0;
         *is_null=1;
         *error=1;
@@ -45,22 +46,9 @@ char *json(UDF_INIT *initid, UDF_ARGS *args,
                 return NULL;
             }else{
                 *is_null = 0;
-                JSON_Array *arr;
                 switch(json_value_get_type(value)){
                     case JSONArray:
-                        arr = json_value_get_array(value);
-                        int i;for (i = 0; i < json_array_get_count(arr); i++) {
-                            JSON_Value *arr_v = json_array_get_value(arr,i);
-                            if(json_value_get_type(arr_v)==JSONString){
-                                strcat(result,json_value_get_string(arr_v));
-                                strcat(result,"\n");
-                            }else{
-                                int len = strlen(result);
-                                if(len>0)memset(result,0,len);
-                                *is_null = 1;
-                                break;
-                            }
-                        }
+                        *is_null = 1;
                         break;
                     case JSONError:
                     case JSONObject:
@@ -68,27 +56,24 @@ char *json(UDF_INIT *initid, UDF_ARGS *args,
                         *error = 1;
                         break;
                     case JSONString:
-                        result = strdup((char*)json_value_get_string(value));
+                        strcpy(initid->ptr,((char*)json_value_get_string(value)));
                         break;
                     case JSONNumber:
-                        sprintf(result,"%f",json_value_get_number(value));
+                        sprintf(initid->ptr,"%f",json_value_get_number(value));
                         break;
                     case JSONNull:
                         *is_null = 1;
                         break;
                     case JSONBoolean:
-                        sprintf(result,"%d",json_value_get_boolean(value));
+                        sprintf(initid->ptr,"%d",json_value_get_boolean(value));
                         break;
                 }
-                *length = result == NULL ? 0 : strlen(result); 
+                *length = initid->ptr == NULL ? 0 : strlen(initid->ptr); 
             }
             json_value_free(value);
         }else{
             *is_null = 1;
         }
-        return result; 
+        return initid->ptr; 
     }
-
 }
-
-
