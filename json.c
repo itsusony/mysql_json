@@ -68,7 +68,7 @@ char *json(UDF_INIT *initid, UDF_ARGS *args,
                         *error = 1;
                         break;
                     case JSONString:
-                        result = (char*)json_value_get_string(value);
+                        result = strdup((char*)json_value_get_string(value));
                         break;
                     case JSONNumber:
                         sprintf(result,"%f",json_value_get_number(value));
