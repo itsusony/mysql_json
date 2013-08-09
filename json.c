@@ -17,7 +17,7 @@ my_bool json_init(UDF_INIT *initid, UDF_ARGS *args, char *message){
         strcpy(message, "json() requires args not null");
         return 1;
     }
-    initid->ptr = calloc(10240,sizeof(char));
+    initid->ptr = calloc(1024*10,sizeof(char));
     return 0;
 }
 
@@ -71,7 +71,6 @@ char *json(UDF_INIT *initid, UDF_ARGS *args,
                 }
                 *length = initid->ptr == NULL ? 0 : strlen(initid->ptr); 
             }
-//            json_value_free(value);
         }else{
             *is_null = 1;
         }
