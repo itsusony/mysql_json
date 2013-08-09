@@ -35,6 +35,7 @@ char *json(UDF_INIT *initid, UDF_ARGS *args,
         *length=0;
         *is_null=1;
         *error=1;
+        json_value_free(jv);
         return NULL;
     }else{
         if(json_type == JSONObject){
@@ -70,10 +71,11 @@ char *json(UDF_INIT *initid, UDF_ARGS *args,
                 }
                 *length = initid->ptr == NULL ? 0 : strlen(initid->ptr); 
             }
-            json_value_free(value);
+//            json_value_free(value);
         }else{
             *is_null = 1;
         }
+        json_value_free(jv);
         return initid->ptr; 
     }
 }
